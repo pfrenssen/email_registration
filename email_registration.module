@@ -17,6 +17,7 @@ function email_registration_user($op, &$edit, &$account, $category = NULL) {
       $nameidx = db_result(db_query($sql, $namenew));
       $namenew .= '_' . ($nameidx + 1);
     }
+    // replace with generated username
     db_query("UPDATE {users} SET name = '%s' WHERE uid = '%s'", $namenew, $account->uid);
 	  break;
   }
