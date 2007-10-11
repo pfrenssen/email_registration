@@ -9,14 +9,15 @@
 function email_registration_user($op, &$edit, &$account, $category = NULL) {
   switch($op) {
     case 'insert':
-	  $newname = preg_replace('/@.*$/', '', $edit['mail']);
-
-	  if (db_num_rows(db_query("SELECT uid FROM {users} WHERE uid != %d AND LOWER(name) = LOWER('%s')", $account->uid, $newname)) > 0) {
-        // may need to fix this if dupe random names are created. although not lkely, still there's no error checking
-        $newname .= rand(100,999);
+	  $namenew = preg_replace('/@.*$/', '', $edit['mail']);
+    // if username generated from email record already exists, append underscore and number eg:(chris_123)
+	  if (db_num_rows(db_query("SELECT uid FROM {users} WHERE uid != %d AND LOWER(name) = LOWER('%s')", $account->uid, $namenew)) > 0) {
+      // find the next number available to append to the name
+      $sql = "SELECT SUBSTRING_INDEX(name,'_',-1) FROM {users} WHERE name REGEXP '^%s_[0-9]+$' ORDER BY CAST(SUBSTRING_INDEX(name,'_',-1) AS UNSIGNED) DESC LIMIT 1";
+      $nameidx = db_result(db_query($sql, $namenew));
+      $namenew .= '_' . ($nameidx + 1);
     }
-
-    db_query("UPDATE {users} SET name = '%s' WHERE uid = '%s'", $newname, $account->uid);
+    db_query("UPDATE {users} SET name = '%s' WHERE uid = '%s'", $namenew, $account->uid);
 	  break;
   }
   return;
