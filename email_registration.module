@@ -1,0 +1,68 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_user().
+ *
+ */
+
+function email_registration_user($op, &$edit, &$account, $category = NULL) {
+  switch($op) {
+    case 'insert':
+	  $newname = preg_replace('/@.*$/', '', $edit['mail']);
+
+	  if (db_num_rows(db_query("SELECT uid FROM {users} WHERE uid != %d AND LOWER(name) = LOWER('%s')", $account->uid, $newname)) > 0) {
+        // may need to fix this if dupe random names are created. although not lkely, still there's no error checking
+        $newname .= rand(100,999);
+    }
+
+    db_query("UPDATE {users} SET name = '%s' WHERE uid = '%s'", $newname, $account->uid);
+	  break;
+  }
+  return;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ *
+ */
+
+function email_registration_form_alter($form_id, &$form) {
+  switch ($form_id) {
+    case 'user_register':
+      $form['name']['#type'] = 'hidden';
+      $form['name']['#value'] = user_password();
+      $form['mail']['#title'] = t('E-mail');
+      break;
+
+    case 'user_pass':
+      $form['name']['#title'] = t('E-mail');
+	    $form['name']['#description'] = t('Enter your e-mail address. You\'ll be sent a new password immediately.');
+      break;
+
+    case 'user_login':
+      $form['name']['#title'] = t('E-mail');
+	    $form['name']['#description'] = 'Enter your e-mail address.';
+	    $form['#validate'] = array('email_registration_user_login_validate' => array()) + $form['#validate'];
+      break;
+
+    case 'user_login_block':
+      $form['name']['#title'] = t('E-mail');
+	    $form['#validate'] = array('email_registration_user_login_validate' => array()) + $form['#validate'];
+      break;
+  }  
+}
+
+/**
+ * Custom validation function for user login form.
+ * Allows users to authenticate by email only, which is our preferred method.
+ *
+ */
+
+function email_registration_user_login_validate($form_id, $form_values, $form) {
+  if (isset($form_values['name'])) {
+    if ($name = db_result(db_query("SELECT name FROM {users} WHERE LOWER(mail) = LOWER('%s')", $form_values['name']))) {
+      form_set_value($form['name'], $name);
+    }
+  }
+}
