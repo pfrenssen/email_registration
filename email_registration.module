@@ -56,6 +56,15 @@ function email_registration_form_alter($form_id, &$form) {
   }  
 }
 
+/* function email_registration_settings() {
+
+
+  return system_settings_form($form);
+}
+*/
+
+
+
 /**
  * Custom validation function for user login form.
  * Allows users to authenticate by email only, which is our preferred method.
