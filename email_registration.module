@@ -51,8 +51,8 @@ function email_registration_form_alter(&$form, $form_state, $form_id) {
 
     case 'user_login':
       $form['name']['#title'] = t('E-mail');
-      $form['name']['#description'] = 'Enter your e-mail address.';
-      $form['pass']['#description'] = 'Enter the password that accompanies your e-mail.';
+      $form['name']['#description'] = t('Enter your e-mail address.');
+      $form['pass']['#description'] = t('Enter the password that accompanies your e-mail.');
       $form['name']['#element_validate'][] = 'email_registration_user_login_validate';
       break;
 
