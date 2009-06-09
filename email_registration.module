@@ -5,7 +5,6 @@
  * Implementation of hook_user().
  *
  */
-
 function email_registration_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'insert':
@@ -28,7 +27,6 @@ function email_registration_user($op, &$edit, &$account, $category = NULL) {
  * Implementation of hook_form_alter().
  *
  */
-
 function email_registration_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
     case 'user_register':
@@ -76,7 +74,6 @@ function email_registration_form_alter(&$form, $form_state, $form_id) {
  * Allows users to authenticate by email only, which is our preferred method.
  *
  */
-
 function email_registration_user_login_validate($form, &$form_state) {
   if (isset($form_state['values']['name'])) {
     if ($name = db_result(db_query("SELECT name FROM {users} WHERE LOWER(mail) = LOWER('%s')", $form_state['values']['name']))) {
