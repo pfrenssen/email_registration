@@ -32,11 +32,11 @@ function email_registration_user($op, &$edit, &$account, $category = NULL) {
 function email_registration_form_alter(&$form, $form_state, $form_id) {
   switch ($form_id) {
     case 'user_register':
-      if (is_array($form['account'])) {
+      if (isset($form['account']) && is_array($form['account'])) {
         $form['account']['name']['#type'] = 'hidden';
         $form['account']['name']['#value'] = user_password();
         $form['account']['mail']['#title'] = t('E-mail');
-      } 
+      }
       else {
         $form['name']['#type'] = 'hidden';
         $form['name']['#value'] = user_password();
@@ -60,10 +60,10 @@ function email_registration_form_alter(&$form, $form_state, $form_id) {
       $form['name']['#title'] = t('E-mail');
       $form['name']['#element_validate'][] = 'email_registration_user_login_validate';
       break;
-  }  
+  }
 }
 
-/** 
+/**
  * function email_registration_settings() {
  *  return system_settings_form($form);
  * }
