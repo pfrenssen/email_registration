@@ -8,17 +8,34 @@
 function email_registration_user($op, &$edit, &$account, $category = NULL) {
   switch ($op) {
     case 'insert':
-    $namenew = preg_replace('/@.*$/', '', $edit['mail']);
-    // if username generated from email record already exists, append underscore and number eg:(chris_123)
-    if (db_result(db_query("SELECT count(*) FROM {users} WHERE uid <> %d AND LOWER(name) = LOWER('%s')", $account->uid, $namenew)) > 0) {
-      // find the next number available to append to the name
-      $sql = "SELECT SUBSTRING_INDEX(name,'_',-1) FROM {users} WHERE name REGEXP '%s' ORDER BY CAST(SUBSTRING_INDEX(name,'_',-1) AS UNSIGNED) DESC LIMIT 1";
-      $nameidx = db_result(db_query($sql, '^'. $namenew .'_[0-9]+$'));
-      $namenew .= '_'. ($nameidx + 1);
-    }
-    // replace with generated username
-    db_query("UPDATE {users} SET name = '%s' WHERE uid = '%s'", $namenew, $account->uid);
-  break;
+      // Other modules may implement hook_email_registration_name($edit, $account)
+      // to generate a username (return a string to be used as the username, NULL
+      // to have email_registration generate it)
+      $names = module_invoke_all('email_registration_name', $edit, $account);
+      // Remove any empty entries
+      $names = array_filter($names);
+
+      if (empty($names)) {
+        // Default implementation of name generation
+        $namenew = preg_replace('/@.*$/', '', $edit['mail']);
+        // if username generated from email record already exists, append underscore and number eg:(chris_123)
+        if (db_result(db_query("SELECT count(*) FROM {users} WHERE uid <> %d AND LOWER(name) = LOWER('%s')", $account->uid, $namenew)) > 0) {
+          // find the next number available to append to the name
+          $sql = "SELECT SUBSTRING_INDEX(name,'_',-1) FROM {users} WHERE name REGEXP '%s' ORDER BY CAST(SUBSTRING_INDEX(name,'_',-1) AS UNSIGNED) DESC LIMIT 1";
+          $nameidx = db_result(db_query($sql, '^'. $namenew .'_[0-9]+$'));
+          $namenew .= '_'. ($nameidx + 1);
+        }
+      }
+      else {
+        // One would expect a single implementation of the hook, but if there
+        // are multiples out there use the last one
+        $namenew = array_pop($names);
+      }
+
+      // replace with generated username
+      db_query("UPDATE {users} SET name = '%s' WHERE uid = '%s'", $namenew, $account->uid);
+      $account->name = $namenew;
+      break;
   }
   return;
 }
