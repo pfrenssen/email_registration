@@ -2,6 +2,12 @@
 // $Id$
 
 /**
+ * @file
+ * For registration process without a username
+ *
+ */
+
+/**
  * Implementation of hook_user().
  *
  */
@@ -86,14 +92,6 @@ function email_registration_form_alter(&$form, $form_state, $form_id) {
       break;
   }
 }
-
-/**
- * function email_registration_settings() {
- *  return system_settings_form($form);
- * }
- */
-
-
 
 /**
  * Custom validation function for user login form.
