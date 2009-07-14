@@ -1,5 +1,5 @@
 <?php
-// $Id:
+// $Id$
 
 /**
  * Implementation of hook_install().
@@ -8,9 +8,14 @@ function email_registration_install() {
   db_query("UPDATE {system} SET weight = 10 WHERE name = 'email_registration'");
 }
 
-
 function email_registration_update_2() {
   $ret = array();
   $ret[] = update_sql("UPDATE {system} SET weight = 10 WHERE name = 'email_registration'");
+  return $ret;
+}
+
+function email_registration_update_3() {
+  $ret = array();
+  $ret[] = update_sql("UPDATE {system} SET weight = 0 WHERE name = 'email_registration'");
   return $ret;
 }
