@@ -34,6 +34,12 @@ function email_registration_user($op, &$edit, &$account, $category = NULL) {
 
       // replace with generated username
       db_query("UPDATE {users} SET name = '%s' WHERE uid = '%s'", $namenew, $account->uid);
+      // if email verification is off and a new user is the one creating account, log the new user in with correct name
+      global $user;
+      if (!variable_get('user_email_verification', 1) && $user->uid == 0) {  
+        $user = $account;
+        $user->name = $namenew;
+      }
       $account->name = $namenew;
       break;
   }
