@@ -48,7 +48,7 @@ function email_registration_user($op, &$edit, &$account, $category = NULL) {
 
       // if email verification is off and a new user is the one creating account, log the new user in with correct name
       global $user;
-      if (!variable_get('user_email_verification', 1) && $user->uid == 0) {  
+      if (!variable_get('user_email_verification', 1) && $user->uid == 0) {
         $user = $account;
         $user->name = $namenew;
       }
@@ -75,6 +75,7 @@ function email_registration_form_alter(&$form, $form_state, $form_id) {
         $form['name']['#value'] = user_password();
         $form['mail']['#title'] = t('E-mail');
       }
+      $form['#submit'][] = 'custom_email_registration_name_submit';
       break;
 
     case 'user_pass':
@@ -93,6 +94,36 @@ function email_registration_form_alter(&$form, $form_state, $form_id) {
       $form['name']['#title'] = t('E-mail');
       $form['name']['#element_validate'][] = 'email_registration_user_login_validate';
       break;
+  }
+}
+
+
+/**
+ * Custom submit handler to fix redirect for immediate logins
+ * #648450
+ *
+ */
+function custom_email_registration_name_submit($form, &$form_state) {
+  if (!isset($form_state['user'])) {
+    return;
+  }
+
+  $admin = user_access('administer users');
+  $account = $form_state['user'];
+
+  if (!variable_get('user_email_verification', TRUE) && $account->status && !$admin) {
+    // No e-mail verification is required, create new user account, and login
+    // user immediately.
+    $auth = array(
+      'pass' => $form_state['values']['pass'],
+      'name' => $account->name,
+    );
+    if (user_authenticate($auth)) {
+      // Authenticated, add a message and go to the users account
+      // Since the standard workflow doesn't work, no other messages should appear.
+      drupal_set_message(t('Registration successful. You are now logged in.'));
+      $form_state['redirect'] = 'user/'. $account->uid;
+    }
   }
 }
 
