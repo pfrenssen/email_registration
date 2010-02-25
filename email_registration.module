@@ -24,6 +24,9 @@ function email_registration_user($op, &$edit, &$account, $category = NULL) {
       if (empty($names)) {
         // Default implementation of name generation
         $namenew = preg_replace('/@.*$/', '', $edit['mail']);
+        // Remove unwanted characters
+        $namenew = preg_replace('/[^a-zA-Z0-9.-]/', '', $namenew);
+
         // if username generated from email record already exists, append underscore and number eg:(chris_123)
         if (db_result(db_query("SELECT count(*) FROM {users} WHERE uid <> %d AND LOWER(name) = LOWER('%s')", $account->uid, $namenew)) > 0) {
           // find the next number available to append to the name
