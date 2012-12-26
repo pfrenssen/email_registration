@@ -62,7 +62,7 @@ function email_registration_user_insert(&$edit, &$account, $category = NULL) {
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function email_registration_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+function email_registration_form_user_register_form_alter(&$form, &$form_state) {
   $form['account']['name']['#type'] = 'hidden';
   $form['account']['name']['#value'] = 'email_registration_' . user_password();
   $form['account']['mail']['#title'] = t('E-mail');
@@ -71,7 +71,7 @@ function email_registration_form_user_register_form_alter(&$form, &$form_state, 
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function email_registration_form_user_pass_alter(&$form, &$form_state, $form_id) {
+function email_registration_form_user_pass_alter(&$form, &$form_state) {
   $form['name']['#title'] = t('E-mail');
   $form['name']['#description'] = t('A password reset message will be sent to your e-mail address.');
 }
@@ -79,7 +79,7 @@ function email_registration_form_user_pass_alter(&$form, &$form_state, $form_id)
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function email_registration_form_user_login_alter(&$form, &$form_state, $form_id) {
+function email_registration_form_user_login_alter(&$form, &$form_state) {
   $form['name']['#title'] = t('E-mail');
   $form['name']['#description'] = t('Enter your e-mail address.');
   $form['name']['#element_validate'][] = 'email_registration_user_login_validate';
@@ -89,7 +89,7 @@ function email_registration_form_user_login_alter(&$form, &$form_state, $form_id
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function email_registration_form_user_login_block_alter(&$form, &$form_state, $form_id) {
+function email_registration_form_user_login_block_alter(&$form, &$form_state) {
   $form['name']['#title'] = t('E-mail');
   $form['name']['#element_validate'][] = 'email_registration_user_login_validate';
 }
