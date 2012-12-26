@@ -31,8 +31,7 @@ class EmailRegistrationTestCase extends DrupalWebTestCase {
    * Test various behaviors for anonymous users.
    */
   function testRegistration() {
-
-
+    variable_set('user_register', USER_REGISTER_VISITORS);
     // Try to register a user.
     $name = $this->randomName();
     $pass = $this->randomName(10);
@@ -41,18 +40,17 @@ class EmailRegistrationTestCase extends DrupalWebTestCase {
       'pass[pass1]' => $pass,
       'pass[pass2]' => $pass,
     );
-
     $this->drupalPost('/user/register', $register, t('Create new account'));
+    $this->drupalLogout();
 
     $login = array(
       'name' => $name . '@example.com',
       'pass' => $pass,
     );
     $this->drupalPost('user/login', $login, t('Log in'));
-    $this->assertRaw('<h2>' . $name . '</h2>', t('User properly created, logged in.'));
 
-
-//    $this->assertRaw('id="edit-name" size="60" value="' . $register['given_name']  . '"', t('Given name saved.'));
+    // Really basic confirmatino that the user was created and logged in.
+    $this->assertRaw('<title>' . $name . ' | Drupal</title>', t('User properly created, logged in.'));
 
   }
 }
