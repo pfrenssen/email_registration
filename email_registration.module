@@ -100,6 +100,8 @@ function email_registration_form_user_login_block_alter(&$form, &$form_state) {
  */
 function email_registration_user_login_validate($form, &$form_state) {
   if (isset($form_state['values']['name'])) {
+    // Keep the email value in form state for furher validation.
+    $form_state['values']['email'] = $form_state['values']['name'];
     if ($name = db_query('SELECT name FROM {users} WHERE LOWER(mail) = LOWER(:name)', array(':name' => $form_state['values']['name']))->fetchField()) {
       $form_state['values']['name'] = $name;
     }
