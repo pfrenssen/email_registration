@@ -63,7 +63,7 @@ function email_registration_user_insert(&$edit, &$account, $category = NULL) {
  * Implements hook_form_FORM_ID_alter().
  */
 function email_registration_form_user_register_form_alter(&$form, &$form_state) {
-  $form['account']['name']['#type'] = 'hidden';
+  $form['account']['name']['#type'] = 'value';
   $form['account']['name']['#value'] = 'email_registration_' . user_password();
   $form['account']['mail']['#title'] = t('E-mail');
 }
