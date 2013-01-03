@@ -22,23 +22,17 @@ function email_registration_user_insert(&$edit, &$account, $category = NULL) {
   $names = array_filter($names);
 
   if (empty($names)) {
-    // Default implementation of name generation.
+    // Strip off everything after the @ sign.
     $new_name = preg_replace('/@.*$/', '', $edit['mail']);
-    // Remove unwanted characters.
-    $new_name = preg_replace('/[^a-zA-Z0-9.-]/', '', $new_name);
-
-    // if username generated from email record already exists, append underscore and number eg:(chris_123)
-    if ((bool) db_query("SELECT 1 FROM {users} WHERE uid <> :uid AND LOWER(name) = LOWER(:new_name)", array(':uid' => $account->uid, ':new_name' => $new_name))->fetchField()) {
-      $name_idx = db_query_range("SELECT SUBSTRING_INDEX(name,'_',-1) FROM {users} WHERE name REGEXP :search ORDER BY CAST(SUBSTRING_INDEX(name,'_',-1) AS UNSIGNED) DESC", 0, 1, array(':search' => '^' . $new_name . '_[0-9]+$'))->fetchField();
-
-      $new_name .= '_' . ($name_idx + 1);
-    }
   }
   else {
     // One would expect a single implementation of the hook, but if there
     // are multiples out there use the last one.
     $new_name = array_pop($names);
   }
+
+  // Ensure whatever name we have is unique.
+  $new_name = email_registration_unique_username($new_name, $account->uid);
 
   // Replace with generated username.
   db_update('users')
@@ -50,6 +44,55 @@ function email_registration_user_insert(&$edit, &$account, $category = NULL) {
   $account->name = $new_name;
   return;
 }
+
+/**
+ * Given a starting point for a Drupal username (e.g. the name portion of an
+ * email address) return a legal, unique Drupal username. This function is
+ * designed to work on the results of the /user/register or /admin/people/create
+ * forms which have already called user_validate_name, valid_email_address
+ * or a similar function. If your custom code is creating users, you should
+ * ensure that the email/name is already validated using something like that.
+ *
+ * @param $name
+ *   A name from which to base the final user name.  May contain illegal characters; these will be stripped.
+ *
+ * @param $uid
+ *   (optional) Uid to ignore when searching for unique user (e.g. if we update the username after the
+ *   {users} row is inserted)
+ *
+ * @return
+ *   A unique user name based on $name.
+ *
+ * @see user_validate_name().
+ *
+ */
+function email_registration_unique_username($name, $uid = 0) {
+  // Strip illegal characters.
+  $name = preg_replace('/[^\x{80}-\x{F7} a-zA-Z0-9@_.\'-]/', '', $name);
+
+  // Strip leading and trailing spaces.
+  $name = trim($name);
+
+  // Convert any other series of spaces to a single underscore.
+  $name = preg_replace('/ +/', '_', $name);
+
+  // If there's nothing left use a default.
+  $name = ('' === $name) ? t('user') : $name;
+
+  // Truncate to reasonable size.
+  $name = (drupal_strlen($name) > (USERNAME_MAX_LENGTH - 10)) ? drupal_substr($name, 0, USERNAME_MAX_LENGTH - 11) : $name;
+
+  // Iterate until we find a unique name.
+  $i = 0;
+  do {
+    $new_name = empty($i) ? $name : $name . '_' . $i;
+    $found = db_query_range("SELECT uid from {users} WHERE uid <> :uid AND name = :name", 0, 1, array(':uid' => $uid, ':name' => $new_name))->fetchAssoc();
+    $i++;
+  } while (!empty($found));
+
+  return $new_name;
+}
+
 
 /**
  * Implements hook_form_FORM_ID_alter().
