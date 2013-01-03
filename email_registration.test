@@ -49,8 +49,21 @@ class EmailRegistrationTestCase extends DrupalWebTestCase {
     );
     $this->drupalPost('user/login', $login, t('Log in'));
 
-    // Really basic confirmatino that the user was created and logged in.
+    // Really basic confirmation that the user was created and logged in.
     $this->assertRaw('<title>' . $name . ' | Drupal</title>', t('User properly created, logged in.'));
+
+    // Now try the immediate login.
+    $this->drupalLogout();
+    variable_set('user_email_verification', 0);
+    $name = $this->randomName();
+    $pass = $this->randomName(10);
+    $register = array(
+      'mail' => $name . '@example.com',
+      'pass[pass1]' => $pass,
+      'pass[pass2]' => $pass,
+    );
+    $this->drupalPost('/user/register', $register, t('Create new account'));
+    $this->assertRaw('Registration successful. You are now logged in.', t('User properly created, immediately logged in.'));
 
   }
 }

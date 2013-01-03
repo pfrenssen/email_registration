@@ -47,14 +47,6 @@ function email_registration_user_insert(&$edit, &$account, $category = NULL) {
     ->execute();
 
   $edit['name'] = $new_name;
-
-  // If email verification is off and a new user is the one creating an account,
-  // log the new user in with his correct name.
-  global $user;
-  if (!variable_get('user_email_verification', 1) && $user->uid == 0) {
-    $user = $account;
-    $user->name = $new_name;
-  }
   $account->name = $new_name;
   return;
 }
