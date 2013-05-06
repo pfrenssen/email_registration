@@ -26,7 +26,10 @@
  *   A string defining a generated username.
  */
 function hook_email_registration_name($edit, $account) {
-  return 'u' . $account->uid;
+  // Your hook implementation should ensure that the resulting string
+  // works as a username. You can use email_registration_cleanup_username($name)
+  // to clean up the name.
+  return email_registration_cleanup_username('u' . $account->uid);
 }
 
 /**

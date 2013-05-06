@@ -24,6 +24,8 @@ function email_registration_user_insert(&$edit, &$account, $category = NULL) {
   if (empty($names)) {
     // Strip off everything after the @ sign.
     $new_name = preg_replace('/@.*$/', '', $edit['mail']);
+    // Clean up the username.
+    $new_name = email_registration_cleanup_username($new_name);
   }
   else {
     // One would expect a single implementation of the hook, but if there
@@ -67,21 +69,6 @@ function email_registration_user_insert(&$edit, &$account, $category = NULL) {
  *
  */
 function email_registration_unique_username($name, $uid = 0) {
-  // Strip illegal characters.
-  $name = preg_replace('/[^\x{80}-\x{F7} a-zA-Z0-9@_.\'-]/', '', $name);
-
-  // Strip leading and trailing spaces.
-  $name = trim($name);
-
-  // Convert any other series of spaces to a single underscore.
-  $name = preg_replace('/ +/', '_', $name);
-
-  // If there's nothing left use a default.
-  $name = ('' === $name) ? t('user') : $name;
-
-  // Truncate to reasonable size.
-  $name = (drupal_strlen($name) > (USERNAME_MAX_LENGTH - 10)) ? drupal_substr($name, 0, USERNAME_MAX_LENGTH - 11) : $name;
-
   // Iterate until we find a unique name.
   $i = 0;
   do {
@@ -93,6 +80,32 @@ function email_registration_unique_username($name, $uid = 0) {
   return $new_name;
 }
 
+/**
+ * Function to clean up username
+ * e.g.
+ *     Replace two or more spaces with a single underscore
+ *     Strip illegal characters.
+ *
+ * @param username to be cleaned up
+ * @return cleaned up username
+ */
+function email_registration_cleanup_username($name) {
+  // Strip illegal characters.
+  $name = preg_replace('/[^\x{80}-\x{F7} a-zA-Z0-9@_.\'-]/', '', $name);
+
+  // Strip leading and trailing spaces.
+  $name = trim($name);
+
+  // Convert any other series of spaces to a single underscore.
+  $name = preg_replace('/  +/', '_', $name);
+
+  // If there's nothing left use a default.
+  $name = ('' === $name) ? t('user') : $name;
+
+  // Truncate to a reasonable size.
+  $name = (drupal_strlen($name) > (USERNAME_MAX_LENGTH - 10)) ? drupal_substr($name, 0, USERNAME_MAX_LENGTH - 11) : $name;
+  return $name;
+}
 
 /**
  * Implements hook_form_FORM_ID_alter().
