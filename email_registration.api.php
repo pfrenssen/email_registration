@@ -22,7 +22,7 @@ use Drupal\user\UserInterface;
  * @param \Drupal\user\UserInterface $account
  *   The user object on which the operation is being performed.
  *
- * @return
+ * @return string
  *   A string defining a generated username.
  */
 function hook_email_registration_name(UserInterface $account) {
