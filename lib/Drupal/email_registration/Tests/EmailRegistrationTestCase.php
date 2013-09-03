@@ -2,36 +2,42 @@
 
 /**
  * @file
- * email registration simpletest
+ * Contains \Drupal\email_registration\Tests\EmailRegistrationTestCase.
  */
 
-class EmailRegistrationTestCase extends DrupalWebTestCase {
+namespace Drupal\email_registration\Tests;
+
+use Drupal\simpletest\WebTestBase;
+
+class EmailRegistrationTestCase extends WebTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = array('email_registration');
+
   /**
    * Implementation of getInfo().
    */
   public static function getInfo() {
     return array(
-      'name' => t('Email registration.'),
-      'description' => t('Test the email registration module.'),
-      'group' => t('Email registration'),
+      'name' => 'Email registration.',
+      'description' => 'Test the email registration module.',
+      'group' => 'Email registration',
     );
-  }
-
-  /**
-   * Implementation of setUp().
-   */
-  function setUp() {
-    parent::setUp('email_registration');
-
-    // Configure to allow set password.
-    variable_set('user_email_verification', FALSE);
   }
 
   /**
    * Test various behaviors for anonymous users.
    */
   function testRegistration() {
-    variable_set('user_register', USER_REGISTER_VISITORS);
+    $user_config = $this->container->get('config.factory')->get('user.settings');
+    $user_config
+      ->set('verify_mail', FALSE)
+      ->set('register', USER_REGISTER_VISITORS)
+      ->save();
     // Try to register a user.
     $name = $this->randomName();
     $pass = $this->randomName(10);
@@ -54,7 +60,9 @@ class EmailRegistrationTestCase extends DrupalWebTestCase {
 
     // Now try the immediate login.
     $this->drupalLogout();
-    variable_set('user_email_verification', 0);
+    $user_config
+      ->set('verify_mail', FALSE)
+      ->save();
     $name = $this->randomName();
     $pass = $this->randomName(10);
     $register = array(
@@ -64,6 +72,6 @@ class EmailRegistrationTestCase extends DrupalWebTestCase {
     );
     $this->drupalPost('/user/register', $register, t('Create new account'));
     $this->assertRaw('Registration successful. You are now logged in.', t('User properly created, immediately logged in.'));
-
   }
+
 }
