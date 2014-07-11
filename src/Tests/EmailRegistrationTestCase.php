@@ -9,6 +9,11 @@ namespace Drupal\email_registration\Tests;
 
 use Drupal\simpletest\WebTestBase;
 
+/**
+ * Tests the email registration module.
+ *
+ * @group email_registration
+ */
 class EmailRegistrationTestCase extends WebTestBase {
 
   /**
@@ -17,17 +22,6 @@ class EmailRegistrationTestCase extends WebTestBase {
    * @var array
    */
   public static $modules = array('email_registration');
-
-  /**
-   * Implementation of getInfo().
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Email registration.',
-      'description' => 'Test the email registration module.',
-      'group' => 'Email registration',
-    );
-  }
 
   /**
    * Test various behaviors for anonymous users.
