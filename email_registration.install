@@ -12,7 +12,7 @@ function email_registration_requirements() {
   $requirements = array();
 
   // @todo Get rid of variable_get() and check is this conflict still valid.
-  if (Drupal::moduleHandler()->moduleExists('logintoboggan') && variable_get('logintoboggan_login_with_email', 0)) {
+  if (\Drupal::moduleHandler()->moduleExists('logintoboggan') && \Drupal::config('logintoboggan.settings')->get('login_with_email')) {
     $requirements['email_registration'] = array(
       'title' => t('Email Registration / LoginToboggan Conflict'),
       'value' => t('Conflict'),
