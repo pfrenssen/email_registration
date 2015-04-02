@@ -27,27 +27,27 @@ class EmailRegistrationTestCase extends WebTestBase {
    * Test various behaviors for anonymous users.
    */
   function testRegistration() {
-    $user_config = $this->container->get('config.factory')->get('user.settings');
+    $user_config = $this->container->get('config.factory')->getEditable('user.settings');
     $user_config
       ->set('verify_mail', FALSE)
       ->set('register', USER_REGISTER_VISITORS)
       ->save();
     // Try to register a user.
-    $name = $this->randomName();
-    $pass = $this->randomName(10);
+    $name = $this->randomMachineName();
+    $pass = $this->randomString(10);
     $register = array(
       'mail' => $name . '@example.com',
       'pass[pass1]' => $pass,
       'pass[pass2]' => $pass,
     );
-    $this->drupalPost('/user/register', $register, t('Create new account'));
+    $this->drupalPostForm('/user/register', $register, t('Create new account'));
     $this->drupalLogout();
 
     $login = array(
       'name' => $name . '@example.com',
       'pass' => $pass,
     );
-    $this->drupalPost('user/login', $login, t('Log in'));
+    $this->drupalPostForm('user/login', $login, t('Log in'));
 
     // Really basic confirmation that the user was created and logged in.
     $this->assertRaw('<title>' . $name . ' | Drupal</title>', t('User properly created, logged in.'));
@@ -57,14 +57,14 @@ class EmailRegistrationTestCase extends WebTestBase {
     $user_config
       ->set('verify_mail', FALSE)
       ->save();
-    $name = $this->randomName();
-    $pass = $this->randomName(10);
+    $name = $this->randomMachineName();
+    $pass = $this->randomString(10);
     $register = array(
       'mail' => $name . '@example.com',
       'pass[pass1]' => $pass,
       'pass[pass2]' => $pass,
     );
-    $this->drupalPost('/user/register', $register, t('Create new account'));
+    $this->drupalPostForm('/user/register', $register, t('Create new account'));
     $this->assertRaw('Registration successful. You are now logged in.', t('User properly created, immediately logged in.'));
   }
 
