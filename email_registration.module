@@ -103,7 +103,7 @@ function email_registration_cleanup_username($name) {
   $name = trim($name);
 
   // Convert any other series of spaces to a single underscore.
-  $name = preg_replace('/  +/', '_', $name);
+  $name = preg_replace('/\s+/', '_', $name);
 
   // If there's nothing left use a default.
   $name = ('' === $name) ? t('user') : $name;
