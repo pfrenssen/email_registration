@@ -151,7 +151,7 @@ function email_registration_user_login_validate($form, FormStateInterface $form_
   $mail = $form_state->getValue('name');
   if (!empty($mail) && ($user = user_load_by_mail($mail))) {
     // Keep the email value in form state for further validation.
-    $form_state->setValue('name', $user->geAccountName());
+    $form_state->setValue('name', $user->getAccountName());
   }
 }
 
