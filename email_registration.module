@@ -132,6 +132,9 @@ function email_registration_form_user_register_form_alter(&$form, FormStateInter
  */
 function email_registration_form_user_pass_alter(&$form, FormStateInterface $form_state) {
   $form['name']['#title'] = t('E-mail');
+  // Allow client side validation of input format.
+  $form['name']['#type'] = 'email';
+  $form['name']['#maxlength'] = Email::EMAIL_MAX_LENGTH;
 }
 
 /**
