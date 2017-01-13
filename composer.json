@@ -6,9 +6,6 @@
     "autoload": {
         "psr-4": {
             "Drupal\\email_registration\\Component\\": "lib"
-        },
-        "classmap": [
-            "lib/DrupalExtension/EmailRegistrationAuthenticationManager.php"
-        ]
+        }
     }
 }
