@@ -1,0 +1,14 @@
+{
+    "name": "drupal/email_registration",
+    "description": " Allows users to register with an e-mail address as their username.",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "autoload": {
+        "psr-4": {
+            "Drupal\\email_registration\\Component\\": "lib"
+        },
+        "classmap": [
+            "lib/DrupalExtension/EmailRegistrationAuthenticationManager.php"
+        ]
+    }
+}
