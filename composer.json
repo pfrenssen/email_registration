@@ -7,5 +7,19 @@
         "psr-4": {
             "Drupal\\email_registration\\Component\\": "lib"
         }
-    }
+    },
+    "require-dev": {
+        "drupal/coder": "^8.2",
+        "drupal/drupal-extension": "dev-authentication-manager",
+        "drush/drush": "^8.1",
+        "friends-of-behat/service-container-extension": "~0.3"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:pfrenssen/drupalextension.git"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
